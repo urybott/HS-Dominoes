@@ -22,15 +22,15 @@ def format_tab(t, n=""):
     res = "tab " + n + "\n"
     for i in range(len(t)):
         res += str(i) + ":" + str(t[i]) + ", "
-    return(res)  # , sep='\n'
+    return(res)
 
 def format_snake(t):
     res = ""
     t_len = len(t)
+    if t_len > 6:
+        t[3:t_len-3] = ["..."]
+        t_len = len(t)
     for i in range(t_len):
-        if t_len > 6 and i == 3:
-            i = t_len -3
-            res += "..."
         res += str(t[i])
     return(res)
 
@@ -45,7 +45,6 @@ def is_str_int(v):
     if len(v) > 0:
         if v[0] == "-":
             v = v[1:]
-
         if v.isdigit():
             res = True
     return res
@@ -67,9 +66,10 @@ def player_input(s="player"):
             a = int(a)
             if abs(a) <= len(game[s]):
                 a_is_right = True
-        else:
-            print(msg_[11])
-            # continue
+                break
+        # else:
+        print(msg_[11])
+        # continue
     return a
 
 
@@ -96,16 +96,18 @@ while not status:
         elif hit in player:
             status = "player"
         i += -1
+    
+snake = [hit]  # [[a, 0] for a in range(7)]  # 
         
 game = {"stock":stock,
         "computer":comp,
         "player":player,
-        "snake":[hit],
+        "snake":snake,
         "first":status
         }
 
-#print("status", status, game[status].index(hit), hit)
-#print("-------")
+# print("status", status, game[status].index(hit), hit)
+# print("-------")
 # print(hit, game[status][game[status].index(hit)])
 
 del game[status][game[status].index(hit)]
@@ -126,13 +128,24 @@ while status == "player" or status == "computer":
     print(msg_[6], len(game["stock"]))
     print(msg_[8], len(game["computer"]))
     print()
-    print(format_snake(game["snake"]))
+    print(format_snake(game["snake"].copy()))
     print()
     print(msg_[7])
     print(format_pieces(game["player"]))
     print()
     
-    
+    if len(game["computer"]) == 0:
+        print(msg_[13])
+        break
+    if len(game["player"]) == 0:
+        print(msg_[12])
+        break
+    if len(game["snake"]) > 6 and game["snake"][0][0] == game["snake"][-1][-1]:
+        s = [a for b in game["snake"] for a in b]
+        if s.count(s[0]) == 8:
+            print(msg_[14])
+            break
+        
     
     if status == "computer":
         print(msg_[9])
@@ -146,7 +159,10 @@ while status == "player" or status == "computer":
             game[status].append(game["stock"].pop(i - 1))
     else:
         i = 0
+        a = 0
         if ans > 0:
             i = len(game["snake"])
+            a = 1
+        b = 1 - a
         game["snake"].insert(i, game[status].pop(abs(ans) - 1))
     
