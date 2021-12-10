@@ -1,6 +1,6 @@
 import random
 
-msg_ = [""] * 15
+msg_ = [""] * 20
 msg_[0] = "Stock pieces:"
 msg_[1] = "Computer pieces:"
 msg_[2] = "player pieces:"
@@ -16,6 +16,8 @@ msg_[11] = "Invalid input. Please try again."
 msg_[12] = "Status: The game is over. You won!"
 msg_[13] = "Status: The game is over. The computer won!"
 msg_[14] = "Status: The game is over. It's a draw!"
+msg_[15] = "Stock is empty!"
+msg_[16] = "Illegal move. Please try again."
 #
 
 def format_tab(t, n=""):
@@ -43,33 +45,61 @@ def format_pieces(t):
 def is_str_int(v):
     res = False
     if len(v) > 0:
-        if v[0] == "-":
+        if v[0] == "-" or v[0] == "+":
             v = v[1:]
         if v.isdigit():
             res = True
     return res
 
+def check_input(hit):
+    i = 0
+    a = 0
+    if hit > 0:
+        i = len(game["snake"])
+        a = 1
+    b = 1 - a
+    c = game[status][abs(hit) - 1]
+    d = game["snake"][i - a]
+    return d[a] in c  # c[b] d[a]
+
+
+
 def comp_input():
+    a_is_right = False
+    a = 0
+    # print(format_pieces(game["computer"]))
     a = input()
-    a = random.randint(-len(game["computer"]), len(game["computer"]))
-    print("comp select", a)
+    while not a_is_right:
+        a = random.randint(-len(game["computer"]), len(game["computer"]))
+        # print("comp select", a, game[status][abs(a) - 1])
+        if a == 0 or check_input(a):
+            a_is_right = True
+        # else:
+            # print(msg_[16])
     return a
     
 
 def player_input(s="player"):
     a_is_right = False
     a = 0
-    while not a_is_right:
-        #print(msg_[3])
+    m = 11
+    while m:
+        # print(msg_[3])
+        m = 11
         a = input()
         if is_str_int(a):
             a = int(a)
-            if abs(a) <= len(game[s]):
-                a_is_right = True
-                break
-        # else:
-        print(msg_[11])
-        # continue
+            if a == 0:
+                m = 0
+            elif abs(a) > len(game[s]):
+                m = 11
+            elif check_input(a):
+                m = 0
+            else:
+                m = 16
+
+        if m:
+            print(msg_[m])
     return a
 
 
@@ -157,6 +187,8 @@ while status == "player" or status == "computer":
         if len(game["stock"]) > 0:
             i = len(game["stock"])
             game[status].append(game["stock"].pop(i - 1))
+        #else:
+        #    print(msg_[15])
     else:
         i = 0
         a = 0
@@ -164,5 +196,10 @@ while status == "player" or status == "computer":
             i = len(game["snake"])
             a = 1
         b = 1 - a
-        game["snake"].insert(i, game[status].pop(abs(ans) - 1))
+        c = game[status].pop(abs(ans) - 1)
+        d = game["snake"][i - a]
+        if d[a] != c[b]:
+            c.reverse()
+        game["snake"].insert(i, c)
+        
     
