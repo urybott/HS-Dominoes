@@ -62,20 +62,46 @@ def check_input(hit):
     d = game["snake"][i - a]
     return d[a] in c  # c[b] d[a]
 
+def count_nums(p="computer"):
+    s = {x: 0 for x in range(8)}
+    d = game["snake"] + game[p]
+    for el in d:
+        for n in el:
+            s[n] += 1
+    return s
 
+def hit_reting(p="computer"):
+    s = count_nums(p)
+    d = {}
+    for el in game[p]:
+            d[tuple(el)] = s[el[0]] + s[el[1]]
+    return dict(sorted(d.items(), key=lambda x: x[1], reverse=True))
 
 def comp_input():
     a_is_right = False
-    a = 0
     # print(format_pieces(game["computer"]))
     a = input()
-    while not a_is_right:
+    a = 0
+    while 0:  # not a_is_right:
         a = random.randint(-len(game["computer"]), len(game["computer"]))
         # print("comp select", a, game[status][abs(a) - 1])
         if a == 0 or check_input(a):
             a_is_right = True
         # else:
             # print(msg_[16])
+    b = game["snake"][0][0]
+    e = game["snake"][-1][1]
+    d = hit_reting("computer")
+    # print("hit_reting", d)
+    for el in d:
+        if e in el:
+            a = game["computer"].index(list(el)) + 1
+            break
+        elif b in el:
+            a = -(game["computer"].index(list(el)) + 1)
+            break
+    # print("comp select :", a)
+            
     return a
     
 
